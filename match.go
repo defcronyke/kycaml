@@ -1,10 +1,8 @@
 package kycaml
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/antzucaro/matchr"
 )
@@ -78,19 +76,28 @@ func NewLongestCommonSubsequence(s1, s2 string) int {
 	return matchr.LongestCommonSubsequence(s1, s2)
 }
 
-func NewNYSIIS(req ...string) (string, error) {
-	in := strings.Join(req, " ")
+func NewNYSIIS(req ...string) []string {
+	res := make([]string, 0, len(req))
 
-	res := matchr.NYSIIS(in)
-
-	resBytes, err := json.Marshal(res)
-	if err != nil {
-		return "", err
+	for _, r := range req {
+		res1 := matchr.NYSIIS(r)
+		res = append(res, res1)
 	}
 
-	return fmt.Sprintf("%s", resBytes), nil
+	return res
 }
 
 func NewOSA(s1, s2 string) (distance int) {
 	return matchr.OSA(s1, s2)
+}
+
+func NewPhonex(req ...string) []string {
+	res := make([]string, 0, len(req))
+
+	for _, r := range req {
+		res1 := matchr.Phonex(r)
+		res = append(res, res1)
+	}
+
+	return res
 }
