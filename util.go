@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/defcronyke/kycaml/model/cons"
+	"github.com/defcronyke/kycaml/model/sdn"
 )
 
 func NewFile(path string) ([]byte, error) {
@@ -29,6 +30,48 @@ func NewFile(path string) ([]byte, error) {
 	return byteValue, nil
 }
 
+/** SDN List */
+func NewSanctionsSA(path string) (*sdn.Sanctions, error) {
+	pathDefault := "./static/sdn.xml"
+
+	if path == "" {
+		path = pathDefault
+	}
+
+	newFile, err := NewFile(path)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var sanctions sdn.Sanctions
+
+	err = xml.Unmarshal(newFile, &sanctions)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return &sanctions, nil
+}
+
+func NewJSONSanctionsSA(path string) ([]byte, error) {
+	sanctions, err := NewSanctionsSA(path)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	resBytes, err := json.MarshalIndent(sanctions, "", "  ")
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	return resBytes, nil
+}
+
+/** Cons List */
 func NewSanctionsCA(path string) (*cons.Sanctions, error) {
 	pathDefault := "./static/cons.xml"
 
@@ -54,13 +97,13 @@ func NewSanctionsCA(path string) (*cons.Sanctions, error) {
 }
 
 func NewJSONSanctionsCA(path string) ([]byte, error) {
-	sanctionsCA, err := NewSanctionsCA(path)
+	sanctions, err := NewSanctionsCA(path)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return nil, err
 	}
 
-	resBytes, err := json.MarshalIndent(sanctionsCA, "", "  ")
+	resBytes, err := json.MarshalIndent(sanctions, "", "  ")
 	if err != nil {
 		log.Printf("error: %v", err)
 		return nil, err
