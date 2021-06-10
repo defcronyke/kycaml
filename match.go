@@ -1,8 +1,10 @@
 package kycaml
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/antzucaro/matchr"
 )
@@ -74,4 +76,17 @@ func NewLevenshtein(s1, s2 string) (distance int) {
 
 func NewLongestCommonSubsequence(s1, s2 string) int {
 	return matchr.LongestCommonSubsequence(s1, s2)
+}
+
+func NewNYSIIS(req ...string) (string, error) {
+	in := strings.Join(req, " ")
+
+	res := matchr.NYSIIS(in)
+
+	resBytes, err := json.Marshal(res)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s", resBytes), nil
 }
