@@ -26,27 +26,6 @@ func NewDoubleMetaphone(req ...string) [][]string {
 	return res
 }
 
-// func DoubleMetaphoneToString(req [][]*matchr.String) ([][]string, error) {
-// 	if len(req) < 2 {
-// 		return nil, fmt.Errorf("req must have at least 2 elements: num elements: %v", len(req))
-// 	}
-
-// 	res1 := make([]string, 0, len(req[0]))
-// 	res2 := make([]string, 0, len(req[1]))
-
-// 	for _, r := range req[0] {
-// 		res1 = append(res1, r.String())
-// 	}
-
-// 	for _, r := range req[1] {
-// 		res2 = append(res2, r.String())
-// 	}
-
-// 	res := [][]string{res1, res2}
-
-// 	return res, nil
-// }
-
 func NewHamming(s1, s2 string) (int, error) {
 	res, err := matchr.Hamming(s1, s2)
 	if err != nil {
