@@ -90,3 +90,7 @@ func NewNYSIIS(req ...string) (string, error) {
 
 	return fmt.Sprintf("%s", resBytes), nil
 }
+
+func NewOSA(s1, s2 string) (distance int) {
+	return matchr.OSA(s1, s2)
+}
