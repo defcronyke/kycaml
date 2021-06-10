@@ -67,3 +67,7 @@ func NewJaro(s1, s2 string) (distance float64) {
 func NewJaroWinkler(s1, s2 string, lTol bool) (distance float64) {
 	return matchr.JaroWinkler(s1, s2, lTol)
 }
+
+func NewLevenshtein(s1, s2 string) (distance int) {
+	return matchr.Levenshtein(s1, s2)
+}
