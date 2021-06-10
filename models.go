@@ -2,7 +2,7 @@ package kycaml
 
 import "encoding/xml"
 
-/** HTTP Route: GET /static/xml/cons_advanced.xml */
+/** HTTP Route: GET /cons */
 type SanctionsCA struct {
 	XMLName              xml.Name
 	Version              string                 `xml:",attr"`
