@@ -1,9 +1,11 @@
 package kycaml
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -16,7 +18,7 @@ func SetHeader(header, value string, handle http.Handler) func(http.ResponseWrit
 }
 
 func NewFile(path string) ([]byte, error) {
-	newFile, err := os.Open(fmt.Sprintf("%v/%v", os.Getenv("PWD"), path))
+	newFile, err := os.Open(path)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -32,8 +34,14 @@ func NewFile(path string) ([]byte, error) {
 	return byteValue, nil
 }
 
-func NewSanctionsCA() (*SanctionsCA, error) {
-	newFile, err := NewFile("./static/cons.xml")
+func NewSanctionsCA(path string) (*SanctionsCA, error) {
+	pathDefault := "./static/cons.xml"
+
+	if path == "" {
+		path = pathDefault
+	}
+
+	newFile, err := NewFile(path)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -48,4 +56,20 @@ func NewSanctionsCA() (*SanctionsCA, error) {
 	}
 
 	return &sanctionsCA, nil
+}
+
+func NewJSONSanctionsCA(path string) ([]byte, error) {
+	sanctionsCA, err := NewSanctionsCA(path)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	resBytes, err := json.MarshalIndent(sanctionsCA, "", "  ")
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	return resBytes, nil
 }
