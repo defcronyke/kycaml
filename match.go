@@ -50,3 +50,12 @@ func DoubleMetaphoneToString(req [][]*matchr.String) ([][]string, error) {
 
 	return res, nil
 }
+
+func NewHamming(s1, s2 string) (int, error) {
+	res, err := matchr.Hamming(s1, s2)
+	if err != nil {
+		return -1, err
+	}
+
+	return res, nil
+}
