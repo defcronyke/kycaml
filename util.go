@@ -8,14 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-)
 
-func SetHeader(header, value string, handle http.Handler) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set(header, value)
-		handle.ServeHTTP(w, req)
-	}
-}
+	"github.com/defcronyke/kycaml/model/cons"
+)
 
 func NewFile(path string) ([]byte, error) {
 	newFile, err := os.Open(path)
@@ -34,7 +29,7 @@ func NewFile(path string) ([]byte, error) {
 	return byteValue, nil
 }
 
-func NewSanctionsCA(path string) (*SanctionsCA, error) {
+func NewSanctionsCA(path string) (*cons.Sanctions, error) {
 	pathDefault := "./static/cons.xml"
 
 	if path == "" {
@@ -47,15 +42,15 @@ func NewSanctionsCA(path string) (*SanctionsCA, error) {
 		return nil, err
 	}
 
-	var sanctionsCA SanctionsCA
+	var sanctions cons.Sanctions
 
-	err = xml.Unmarshal(newFile, &sanctionsCA)
+	err = xml.Unmarshal(newFile, &sanctions)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
-	return &sanctionsCA, nil
+	return &sanctions, nil
 }
 
 func NewJSONSanctionsCA(path string) ([]byte, error) {
@@ -72,4 +67,11 @@ func NewJSONSanctionsCA(path string) ([]byte, error) {
 	}
 
 	return resBytes, nil
+}
+
+func SetHeader(header, value string, handle http.Handler) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set(header, value)
+		handle.ServeHTTP(w, req)
+	}
 }

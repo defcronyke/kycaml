@@ -1,9 +1,9 @@
-package kycaml
+package cons
 
 import "encoding/xml"
 
 /** HTTP Route: GET /cons */
-type SanctionsCA struct {
+type Sanctions struct {
 	XMLName              xml.Name
 	Version              string                 `xml:",attr"`
 	SchemaLocation       string                 `xml:"schemaLocation,attr"`
