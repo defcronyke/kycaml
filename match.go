@@ -101,3 +101,7 @@ func NewPhonex(req ...string) []string {
 
 	return res
 }
+
+func NewSmithWaterman(s1, s2 string) float64 {
+	return matchr.SmithWaterman(s1, s2)
+}
