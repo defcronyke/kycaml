@@ -6,7 +6,7 @@ import (
 )
 
 /** HTTP Route: GET /cons */
-func USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
+func (k *KycAml) USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := NewJSONSanctionsCA("")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
