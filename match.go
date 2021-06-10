@@ -7,6 +7,10 @@ import (
 	"github.com/antzucaro/matchr"
 )
 
+func NewDamerauLevenshtein(s1, s2 string) (distance int) {
+	return matchr.DamerauLevenshtein(s1, s2)
+}
+
 func NewDoubleMetaphone(req ...string) [][]*matchr.String {
 	res1 := make([]*matchr.String, 0, len(os.Args)-1)
 	res2 := make([]*matchr.String, 0, len(os.Args)-1)
