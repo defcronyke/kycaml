@@ -59,3 +59,7 @@ func NewHamming(s1, s2 string) (int, error) {
 
 	return res, nil
 }
+
+func NewJaro(s1, s2 string) (distance float64) {
+	return matchr.Jaro(s1, s2)
+}
