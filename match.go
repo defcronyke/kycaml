@@ -71,3 +71,7 @@ func NewJaroWinkler(s1, s2 string, lTol bool) (distance float64) {
 func NewLevenshtein(s1, s2 string) (distance int) {
 	return matchr.Levenshtein(s1, s2)
 }
+
+func NewLongestCommonSubsequence(s1, s2 string) int {
+	return matchr.LongestCommonSubsequence(s1, s2)
+}
