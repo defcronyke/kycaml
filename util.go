@@ -30,6 +30,13 @@ import (
 	"github.com/defcronyke/kycaml/model/sdn"
 )
 
+func SetHeader(header, value string, handle http.Handler) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set(header, value)
+		handle.ServeHTTP(w, req)
+	}
+}
+
 func NewFile(path string) ([]byte, error) {
 	newFile, err := os.Open(path)
 	if err != nil {
@@ -129,9 +136,106 @@ func NewJSONSanctionsCA(path string) ([]byte, error) {
 	return resBytes, nil
 }
 
-func SetHeader(header, value string, handle http.Handler) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set(header, value)
-		handle.ServeHTTP(w, req)
+func GetNamesSA(s *sdn.Sanctions) [][]string {
+	names := [][]string{}
+
+	for _, party := range s.DistinctParties.DistinctParty {
+		for _, profile := range party.Profile {
+			for _, identity := range profile.Identity {
+				for _, alias := range identity.Alias {
+					for _, documentedName := range alias.DocumentedName {
+						nameParts := []string{
+							documentedName.FixedRef,
+						}
+
+						for _, documentedNamePart := range documentedName.DocumentedNamePart {
+							for _, namePartValue := range documentedNamePart.NamePartValue {
+								nameParts = append(nameParts, namePartValue.Value)
+							}
+						}
+
+						names = append(names, nameParts)
+					}
+				}
+			}
+		}
 	}
+
+	return names
+}
+
+func GetNamesSAJSON(s *sdn.Sanctions) ([]byte, error) {
+	names := GetNamesSA(s)
+
+	res, err := json.MarshalIndent(names, "", "  ")
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
+func GetNamesCA(s *cons.Sanctions) [][]string {
+	names := [][]string{}
+
+	for _, party := range s.DistinctParties.DistinctParty {
+		for _, profile := range party.Profile {
+			for _, identity := range profile.Identity {
+				for _, alias := range identity.Alias {
+					for _, documentedName := range alias.DocumentedName {
+						nameParts := []string{
+							documentedName.FixedRef,
+						}
+
+						for _, documentedNamePart := range documentedName.DocumentedNamePart {
+							for _, namePartValue := range documentedNamePart.NamePartValue {
+								nameParts = append(nameParts, namePartValue.Value)
+							}
+						}
+
+						names = append(names, nameParts)
+					}
+				}
+			}
+		}
+	}
+
+	return names
+}
+
+func GetNamesCAJSON(s *cons.Sanctions) ([]byte, error) {
+	names := GetNamesCA(s)
+
+	res, err := json.MarshalIndent(names, "", "  ")
+	if err != nil {
+		log.Printf("error: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
+func GetNamesJSON(pathSA, pathCA string) ([]byte, error) {
+	sanctionsSA, err := NewSanctionsSA(pathSA)
+	if err != nil {
+		return nil, err
+	}
+
+	sanctionsCA, err := NewSanctionsCA(pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	namesMerged := append(
+		GetNamesSA(sanctionsSA),
+		GetNamesCA(sanctionsCA)...,
+	)
+
+	res, err := json.MarshalIndent(namesMerged, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

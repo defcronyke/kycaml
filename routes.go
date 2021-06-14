@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 import (
 	"fmt"
 	"net/http"
+	"os"
 )
 
 /** HTTP Route: GET /sdn */
@@ -41,6 +42,23 @@ func (k *KycAml) USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := NewJSONSanctionsCA("")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Fprintf(w, "%s\n", res)
+}
+
+/** HTTP Route: GET /names */
+func (k *KycAml) NamesHandler(w http.ResponseWriter, r *http.Request) {
+	res, err := GetNamesJSON(
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "sdn.xml"),
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "cons.xml"),
+	)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
 		return
 	}
 
