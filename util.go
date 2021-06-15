@@ -25,6 +25,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/defcronyke/kycaml/model/cons"
 	"github.com/defcronyke/kycaml/model/sdn"
@@ -216,7 +217,7 @@ func GetNamesCAJSON(s *cons.Sanctions) ([]byte, error) {
 	return res, err
 }
 
-func GetNamesJSON(pathSA, pathCA string) ([]byte, error) {
+func GetNames(pathSA, pathCA string) ([][]string, error) {
 	sanctionsSA, err := NewSanctionsSA(pathSA)
 	if err != nil {
 		return nil, err
@@ -227,12 +228,116 @@ func GetNamesJSON(pathSA, pathCA string) ([]byte, error) {
 		return nil, err
 	}
 
-	namesMerged := append(
+	names := append(
 		GetNamesSA(sanctionsSA),
 		GetNamesCA(sanctionsCA)...,
 	)
 
-	res, err := json.MarshalIndent(namesMerged, "", "  ")
+	return names, nil
+}
+
+func GetNamesJSON(pathSA, pathCA string) ([]byte, error) {
+	names, err := GetNames(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := json.MarshalIndent(names, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func GetNamesDM(pathSA, pathCA string) (map[string][]string, error) {
+	res := make(map[string][]string)
+
+	names, err := GetNames(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, name := range names {
+		for idx, namePart := range name {
+			// First idx is the DocumentedName's ID value.
+			if idx == 0 {
+				continue
+			}
+
+			namesIn := strings.Split(namePart, " ")
+
+			namesDM := NewDoubleMetaphone(namesIn...)
+
+			for _, nameDM := range namesDM {
+				nameDMStr := strings.Join(nameDM, " ")
+
+				if nameDMStr == "" {
+					continue
+				}
+
+				res[nameDMStr] = name
+			}
+		}
+	}
+
+	return res, nil
+}
+
+func GetNamesDMJSON(pathSA, pathCA string) ([]byte, error) {
+	names, err := GetNamesDM(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := json.MarshalIndent(names, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func GetNamesDB(pathSA, pathCA string) (map[string][]string, error) {
+	res := make(map[string][]string)
+
+	names, err := GetNames(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, name := range names {
+		// NOTE: First idx is the DocumentedName's ID value.
+		for _, namePart := range name {
+			/* Remove this weird "linebreak" entry. Maybe we shouldn't
+			remove it but it looks wrong. */
+			if namePart == "\r\n                " {
+				continue
+			}
+
+			res[namePart] = name
+		}
+	}
+
+	namesDM, err := GetNamesDM(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, val := range namesDM {
+		res[key] = val
+	}
+
+	return res, nil
+}
+
+func GetNamesDBJSON(pathSA, pathCA string) ([]byte, error) {
+	names, err := GetNamesDB(pathSA, pathCA)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := json.MarshalIndent(names, "", "  ")
 	if err != nil {
 		return nil, err
 	}

@@ -53,7 +53,7 @@ func (k *KycAml) USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
 
 /** HTTP Route: GET /names */
 func (k *KycAml) NamesHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := GetNamesJSON(
+	res, err := GetNamesDBJSON(
 		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "sdn.xml"),
 		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "cons.xml"),
 	)

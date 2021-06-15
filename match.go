@@ -34,8 +34,13 @@ func NewDoubleMetaphone(req ...string) [][]string {
 	for _, r := range req {
 		s1, s2 := matchr.DoubleMetaphone(r)
 
-		res1 = append(res1, s1)
-		res2 = append(res2, s2)
+		if s1 != "" {
+			res1 = append(res1, s1)
+		}
+
+		if s2 != "" {
+			res2 = append(res2, s2)
+		}
 	}
 
 	res := [][]string{res1, res2}
