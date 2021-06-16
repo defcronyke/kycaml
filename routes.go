@@ -23,7 +23,14 @@ import (
 	"os"
 )
 
-/** HTTP Route: GET /sdn */
+/** HTTP Route: GET /sdn
+Get the USA's Specially Designated Nationals
+And Blocked Persons list data, in a custom
+unofficial JSON format.
+Built from the official XML list found here:
+https://home.treasury.gov/policy-issues/financial-sanctions/specially-designated-nationals-list-data-formats-data-schemas
+-> SDN_ADVANCED.XML
+(USA Sanctions-based) */
 func (k *KycAml) USASdnJSONHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := NewJSONSanctionsSA("")
 	if err != nil {
@@ -37,7 +44,13 @@ func (k *KycAml) USASdnJSONHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n", res)
 }
 
-/** HTTP Route: GET /cons */
+/** HTTP Route: GET /cons
+Get the USA's Consolidated Advanced Sanctions
+list data, in a custom unofficial JSON format.
+Built from the official XML list found here:
+https://home.treasury.gov/policy-issues/financial-sanctions/consolidated-sanctions-list-non-sdn-lists
+-> CONS_ADVANCED.XML
+(USA Sanctions-based) */
 func (k *KycAml) USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := NewJSONSanctionsCA("")
 	if err != nil {
@@ -51,9 +64,11 @@ func (k *KycAml) USAConsJSONHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n", res)
 }
 
-/** HTTP Route: GET /names */
+/** HTTP Route: GET /names
+Get the names of sanctioned entities.
+(USA Sanctions-based) */
 func (k *KycAml) NamesHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := GetNamesDBJSON(
+	res, err := GetNamesJSON(
 		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "sdn.xml"),
 		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "cons.xml"),
 	)
@@ -68,9 +83,39 @@ func (k *KycAml) NamesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n", res)
 }
 
-/** HTTP Route: GET /score */
-func (k *KycAml) ScoreHandler(w http.ResponseWriter, r *http.Request) {
-	res := ""
+/** HTTP Route: GET /names-dm
+Get the names of sanctioned entities, with a
+double-metaphone encoded lookup key.
+(USA Sanctions-based) */
+func (k *KycAml) NamesDMHandler(w http.ResponseWriter, r *http.Request) {
+	res, err := GetNamesDMJSON(
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "sdn.xml"),
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "cons.xml"),
+	)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Fprintf(w, "%s\n", res)
+}
+
+/** HTTP Route: GET /names-db
+Get the names of sanctioned entities, with a
+combination of all supported encodings of lookup
+keys. (USA Sanctions-based) */
+func (k *KycAml) NamesDBHandler(w http.ResponseWriter, r *http.Request) {
+	res, err := GetNamesDBJSON(
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "sdn.xml"),
+		fmt.Sprintf("%v/static/%v", os.Getenv("PWD"), "cons.xml"),
+	)
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		return
+	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
